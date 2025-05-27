@@ -113,6 +113,19 @@ class MoviesInfoControllerIntgTest {
     }
 
     @Test
+    public void getMovieInfoById_notFound(){
+        //given - precondition or setup
+        String id = "abcd";
+
+        //when & then
+        webTestClient.get()
+                .uri(MOVIES_INFO_URI + "/{id}", id)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
+    }
+
+    @Test
     void updateMovieInfo() {
         //given - precondition or setup
         var id = "abc";
@@ -133,6 +146,24 @@ class MoviesInfoControllerIntgTest {
                     assertNotNull(updatedMovieInfo.getMovieInfoId());
                     assertEquals("Batman Begins3", updatedMovieInfo.getName());
                 });
+
+        //then - verify output
+    }
+
+    @Test
+    void updateMovieInfo_notFound() {
+        //given - precondition or setup
+        var id = "def";
+        var movieInfo = new MovieInfo(null, "Batman Begins3",
+                "2005", List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"));
+
+        //when - action or behaviour that we are going to test
+        webTestClient.put()
+                .uri(MOVIES_INFO_URI + "/{id}", id)
+                .bodyValue(movieInfo)
+                .exchange()
+                .expectStatus()
+                .isNotFound();
 
         //then - verify output
     }
