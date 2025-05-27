@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import javax.validation.constraints.NotBlank;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -17,9 +18,13 @@ public class MovieInfo {
 
     @Id
     private String movieInfoId;
+
+    @NotBlank(message = "movieInfo.name must be present")
     private String name;
+
+    @NotBlank(message = "movieInfo.year must be present")
     private String year;
-    private List<String> cast;
+    private List<@NotBlank(message = "movieInfo.cast must be present") String> cast;
     private LocalDate release_date;
 
 }

@@ -114,6 +114,30 @@ class MoviesInfoControllerUnitTest {
     }
 
     @Test
+    public void addMovieInfo_validation(){
+        //given - precondition or setup
+        var movieInfo = new MovieInfo(null, "",
+                "", List.of(""), LocalDate.parse("2005-06-15"));
+        when(moviesInfoServiceMock.addMovieInfo(isA(MovieInfo.class))).thenReturn(Mono.just(new MovieInfo("mockId", "Batman Begins2",
+                "2005", List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"))));
+
+        //when && then
+        webTestClient.post()
+                .uri(MOVIES_INFO_URI)
+                .bodyValue(movieInfo)
+                .exchange()
+                .expectStatus()
+                .isBadRequest()
+                .expectBody(String.class)
+                .consumeWith(stringEntityExchangeResult  -> {
+                    var responseBody = stringEntityExchangeResult.getResponseBody();
+                    var expectedErrorMessage = "movieInfo.cast must be present,movieInfo.name must be present,movieInfo.year must be present";
+                    assertNotNull(responseBody);
+                    assertEquals(expectedErrorMessage, responseBody);
+                });
+    }
+
+    @Test
     void updateMovieInfo() {
         //given - precondition or setup
         var id = "abc";
