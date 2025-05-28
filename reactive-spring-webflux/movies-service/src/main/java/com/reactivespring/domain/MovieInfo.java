@@ -20,9 +20,9 @@ public class MovieInfo {
     private String movieInfoId;
     @NotBlank(message = "movieInfo.name must be present")
     private String name;
-    @NotNull
-    @Positive(message = "movieInfo.year must be a Positive Value")
-    private Integer year;
+
+    @NotBlank(message = "movieInfo.year must be present")
+    private String year;
 
     @NotNull
     private List<@NotBlank(message = "movieInfo.cast must be present") String> cast;
