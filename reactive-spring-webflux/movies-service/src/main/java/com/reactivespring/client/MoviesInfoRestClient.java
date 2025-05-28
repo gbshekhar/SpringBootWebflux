@@ -37,7 +37,7 @@ public class MoviesInfoRestClient {
                 .onStatus(HttpStatus::is4xxClientError, clientResponse -> {
                     log.error("Status Code : {}", clientResponse.statusCode().value());
                     if(clientResponse.statusCode().equals(HttpStatus.NOT_FOUND)){
-                        return Mono.empty();
+                        return Mono.error(new MoviesInfoClientException("There is no MovieInfo available for the passed in Id : " + movieId, clientResponse.statusCode().value()));
                     }
                     return clientResponse.bodyToMono(String.class)
                             .flatMap(responseMessage -> Mono.error(new ReviewsClientException(responseMessage)));
@@ -46,7 +46,7 @@ public class MoviesInfoRestClient {
                     log.error("Status Code : {}", clientResponse.statusCode().value());
                     return clientResponse.bodyToMono(String.class)
                             .flatMap(responseMessage -> Mono.error(new ReviewsServerException(
-                                    "Server Exception in ReviewService : "+ responseMessage)));
+                                    "Server Exception in MovieInfoService : "+ responseMessage)));
                 })
                 .bodyToMono(MovieInfo.class)
                 .log();
