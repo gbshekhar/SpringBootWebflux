@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.test.StepVerifier;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -86,6 +87,45 @@ class MoviesInfoControllerIntgTest {
                 .hasSize(3);
 
           //then - verify output
+
+    }
+
+    @Test
+    public void getAllMovieInfos_stream(){
+        //given - precondition or setup
+        var movieInfo = new MovieInfo(null, "Batman Begins2",
+                "2005", List.of("Christian Bale", "Michael Cane"), LocalDate.parse("2005-06-15"));
+
+        //when - action or behaviour that we are going to test
+        webTestClient.post()
+                .uri(MOVIES_INFO_URI)
+                .bodyValue(movieInfo)
+                .exchange()
+                .expectStatus()
+                .isCreated()
+                .expectBody(MovieInfo.class)
+                .consumeWith(movieInfoEntityExchangeResult -> {
+                    var savedMovieInfo = movieInfoEntityExchangeResult.getResponseBody();
+                    assertNotNull(savedMovieInfo);
+                    assertNotNull(savedMovieInfo.getMovieInfoId());
+                });
+
+        //when  - action or behaviour that we are going to test
+        var moviesStreamFlux = webTestClient.get()
+                .uri(MOVIES_INFO_URI + "/stream")
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful()
+                .returnResult(MovieInfo.class)
+                .getResponseBody();
+
+        //then
+        StepVerifier.create(moviesStreamFlux)
+                .assertNext(movieInfo1 -> {
+                    assert movieInfo1.getMovieInfoId() != null;
+                })
+                .thenCancel()
+                .verify();
 
     }
 
